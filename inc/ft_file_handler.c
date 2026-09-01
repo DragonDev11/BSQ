@@ -12,12 +12,16 @@
 
 #include "ft_file_handler.h"
 #include "ft_string.h"
-#include "ft_errors_hanlder.h"
+#include "ft_errors_handler.h"
 #include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h>
 
-FT_FILE	ft_open(char *path, char *modes)
+FT_FILE	*ft_open(char *path, char *modes)
 {
 	char	**file_names;
+	char	**tmp;
+	int		i;
 	FT_FILE	*file;
 
 	if (ft_strlen(path) >= PATH_MAX)
@@ -27,6 +31,8 @@ FT_FILE	ft_open(char *path, char *modes)
 		ft_putstr("Warning: Failed to check the path\nfix it, continuing anyways.\n");
 	else
 	{
+		i = 0;
+		tmp = file_names;
 		while (*file_names)
 		{
 			if (ft_strlen(*file_names) > FILE_NAME_MAX)
@@ -37,11 +43,12 @@ FT_FILE	ft_open(char *path, char *modes)
 				return (NULL);
 			}
 			file_names++;
+			i++;
 		}
+		free_double_pointer((void **)tmp, i, sizeof(char *));
 	}
-	free(file_names);
 	if (ft_strlen(modes) != 2)
-		return (-1);
+		return (NULL);
 	file = (FT_FILE *)malloc(sizeof(FT_FILE));
 	if (file == NULL)
 		return (NULL);
@@ -55,7 +62,7 @@ FT_FILE	ft_open(char *path, char *modes)
 	file->offset = 0;
 	file->size = 0;
 	file->modes = ft_strdup(modes);
-	if (file->id == -1)
+	if (file->fd == -1)
 	{
 		free(file);
 		return (NULL);
@@ -63,18 +70,13 @@ FT_FILE	ft_open(char *path, char *modes)
 	return (file);
 }
 
-int	ft_fread(unsigned int size, char *buffer, FT_FILE file)
+int	ft_read(unsigned int size, char *buffer, FT_FILE *file)
 {
 	int	bytes_read;
 
-	if (file == NULL)
+	if (file == NULL || buffer == NULL)
 		return (-1);
 	if (file->fd == -1)
-		return (-1);
-	if (buffer)
-		free(buffer);
-	buffer = malloc(sizeof(char) * size);
-	if (buffer == NULL)
 		return (-1);
 	bytes_read = read(file->fd, buffer, size);
 	if (bytes_read != -1)
@@ -85,7 +87,7 @@ int	ft_fread(unsigned int size, char *buffer, FT_FILE file)
 	return (-1);
 }
 
-int	ft_write(unsigned int size, char *buffer, FT_FILE file)
+int	ft_write(unsigned int size, char *buffer, FT_FILE *file)
 {
 	int	bytes_written;
 
@@ -102,7 +104,7 @@ int	ft_write(unsigned int size, char *buffer, FT_FILE file)
 	return (-1);
 }
 
-int	ft_close(FT_FILE file)
+int	ft_close(FT_FILE *file)
 {
 	int	ret;
 
@@ -122,22 +124,23 @@ int	ft_close(FT_FILE file)
 	return (ret);
 }
 
-FT_FILE	*reset_offset(FT_FILE file)
+FT_FILE	*ft_reset_offset(FT_FILE *file)
 {
-	FT_FILE	*new;
+	FT_FILE	temp;
+	FT_FILE *new;
 	
 	new = malloc(sizeof(FT_FILE));
 	if (new == NULL)
 		return (NULL);
-	new->path = ft_strdup(file->path);
-	new->modes = ft_strdup(file->modes);
-	new->length = file->length;
+	temp.path = ft_strdup(file->path);
+	temp.modes = ft_strdup(file->modes);
+	temp.length = file->length;
 	if (ft_close(file) != 0)
 	{
 		free(new);
 		return (NULL);
 	}
-	new->fd = ft_open(new->path, new->modes);
+	new = ft_open(temp.path, temp.modes);
 	if (new->fd == -1)
 	{
 		free(new->path);
@@ -145,6 +148,7 @@ FT_FILE	*reset_offset(FT_FILE file)
 		free(new);
 		return (NULL);
 	}
+	new->length = temp.length;
 	return (new);
 }
 
@@ -158,7 +162,7 @@ int	ft_prep_file(FT_FILE *file)
 	if (file->fd == -1)
 		return (-1);
 	read(file->fd, &c, 1);
-	while (c != EOF)
+	while (c != buffer[file->size - 1])
 	{
 		file->length++;
 		read(file->fd, &c, 1);
@@ -183,7 +187,7 @@ int	ft_prep_file(FT_FILE *file)
 	return (0);
 }
 
-char	**ft_extract_lines(FT_FILE file)
+char	**ft_extract_lines(FT_FILE *file)
 {
 	char	**lines;
 
@@ -197,7 +201,7 @@ char	**ft_extract_lines(FT_FILE file)
 	return (lines);
 }
 
-char	ft_is_file_valid(FT_FILE file)
+char	ft_is_file_valid(FT_FILE *file)
 {
 	char	**lines;
 	int	i;
@@ -273,3 +277,5 @@ char	ft_is_file_valid(FT_FILE file)
 		return (0);
 	return (1);
 }
+
+int	ft_calculate_file_size(FT_FILE *file, )

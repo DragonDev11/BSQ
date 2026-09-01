@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 #include "ft_errors_handler.h"
+#include "ft_string.h"
 
 void	free_double_pointer(void **p, unsigned int elements, unsigned int element_size)
 {
@@ -24,4 +25,11 @@ void	free_double_pointer(void **p, unsigned int elements, unsigned int element_s
 		i += element_size;
 	}
 	free(p);
+}
+
+void	ft_puterror(char *msg)
+{
+	ft_putstr("Error: ");
+	ft_putstr(msg);
+	ft_putstr("\n");
 }

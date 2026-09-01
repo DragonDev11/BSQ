@@ -13,6 +13,14 @@
 #include "ft_string.h"
 #include <stdlib.h>
 
+int	ft_strlen(char *str)
+{
+	int	l;
+
+	l = 0;
+	while (l > 
+}
+
 char	ft_is_printable(char c)
 {
 	return (c >= 32 && c <= 126);
@@ -69,6 +77,24 @@ char	*ft_strstr(char *str, char *to_find, int *word_length)
 	}
 	*word_length = i;
 	return (str + i);
+}
+
+char	*ft_strdup(char *src, unsigned int n)
+{
+	char			*dup;
+	unsigned int	i;
+
+	dup = (char *)malloc(ft_strlen(src) + 1);
+	if (dup == NULL)
+		return (NULL);
+	i = 0;
+	while (src[i])
+	{
+		dup[i] = src[i];
+		i++;
+	}
+	dup[i] = '\0';
+	return (dup);
 }
 
 char	*ft_strndup(char *src, unsigned int n)

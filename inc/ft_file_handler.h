@@ -20,14 +20,19 @@ typedef struct FT_FILE
 	int		fd;
 	int		offset;
 	int		size;
+	int		length;
 	char	*buffer;
 	char	*path;
+	char	*modes;
 }	FT_FILE;
 
-unsigned int	ft_read(unsigned int buffer_size, char *buffer, FT_FILE file);
-FT_FILE		ft_open(char *path, char *modes);
-unsigned int	ft_close(FT_FILE file);
-unsigned int	ft_write(unsigned int buffer_size, char *buffer, FT_FILE file);
-char		ft_is_file_valid(FT_FILE file);
+int			ft_read(unsigned int buffer_size, char *buffer, FT_FILE *file);
+FT_FILE		*ft_open(char *path, char *modes);
+int			ft_close(FT_FILE *file);
+int			ft_write(unsigned int buffer_size, char *buffer, FT_FILE *file);
+char		ft_is_file_valid(FT_FILE *file);
+char		**ft_extract_lines(FT_FILE *file);
+int			ft_prep_file(FT_FILE *file);
+FT_FILE		*ft_reset_offset(FT_FILE *file);
 #endif
 

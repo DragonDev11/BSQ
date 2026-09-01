@@ -21,6 +21,7 @@ int	ft_str_contains(char c, char *str);
 int	ft_count_words(char *str, char *charset);
 char	*ft_strstr(char *str, char *to_find, int *word_length);
 char	*ft_strndup(char *src, unsigned int n);
+char	*ft_strdup(char *src);
 char	**ft_split(char *str, char *charset);
 
 #endif

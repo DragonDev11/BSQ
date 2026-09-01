@@ -14,5 +14,6 @@
 # define FT_ERRORS_HANDLER_H
 
 void	free_double_pointer(void **p, unsigned int elements, unsigned int element_size);
+void	ft_puterror(char *msg);
 
 #endif
