@@ -6,7 +6,7 @@
 /*   By: mhmichi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/31 14:17:10 by mhmichi           #+#    #+#             */
-/*   Updated: 2026/09/02 14:00:50 by mhmichi          ###   ########.fr       */
+/*   Updated: 2026/09/02 18:47:57 by mhmichi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,11 +247,12 @@ char	ft_is_file_valid(FT_FILE *file)
 	int		k;
 	char	charset[4];
 	char	*num_str;
-	int		width;
+	int		past_width;
+	int		curr_width;
 	int		actual_height;
 	int		expected_height;
 
-	width = 0;
+	past_width = -1;
 	expected_height = 0;
 	actual_height = 0;
 	if (file == NULL)
@@ -311,15 +312,21 @@ char	ft_is_file_valid(FT_FILE *file)
 		while (lines[i][j]
 			&& ft_str_contains(lines[i][j], charset) > -1)
 			j++;
-		if (i == 1)
+		if (i > 0)
 		{
-			if (width == 0)
-				width = j;
-			if (j != width)
+			curr_width = j;
+			if (past_width != -1)
 			{
-				free_double_pointer((void **)lines,
-					actual_height + 1, sizeof(char *));
-				return (0);
+				if (past_width != curr_width)
+				{
+					free_double_pointer((void **)lines,
+						actual_height + 1, sizeof(char *));
+					return (0);
+				}
+			}
+			else
+			{
+				past_width = curr_width;
 			}
 		}
 		i++;
@@ -452,19 +459,10 @@ FT_MAP	*ft_extract_map(FT_FILE *file)
 		free(map);
 		return (NULL);
 	}
-	map->height = 1;
-	while (lines[map->height] != NULL)
+	map->height = 0;
+	while (lines[map->height + 1] != NULL)
 		map->height++;
-	map->height--;
 	map->width = ft_strlen(lines[1]);
-	if (map->width != map->height)
-	{
-		free(map->tiles);
-		free_double_pointer((void **)lines,
-			map->height + 1, sizeof(char *));
-		free(map);
-		return (NULL);
-	}
 	map->map = malloc(sizeof(int *) * map->height);
 	if (map->map == NULL)
 	{
@@ -492,9 +490,9 @@ FT_MAP	*ft_extract_map(FT_FILE *file)
 		while (j < map->width)
 		{
 			if (lines[i + 1][j] == map->tiles[0])
-				map->map[i][j] = 0;
-			else if (lines[i + 1][j] == map->tiles[1])
 				map->map[i][j] = 1;
+			else if (lines[i + 1][j] == map->tiles[1])
+				map->map[i][j] = 0;
 			j++;
 		}
 		i++;
