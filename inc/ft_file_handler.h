@@ -6,7 +6,7 @@
 /*   By: mhmichi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/31 14:16:36 by mhmichi           #+#    #+#             */
-/*   Updated: 2026/08/31 16:35:29 by mhmichi          ###   ########.fr       */
+/*   Updated: 2026/09/02 11:34:03 by mhmichi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,11 @@
 # define FT_FILE_HANDLER_H
 # define PATH_MAX 4095
 # define FILE_NAME_MAX 255
+# define SEEK_CURRENT 0
+# define SEEK_LIMIT 1
+# define SEEK_PUT 2
 
-typedef struct FT_FILE
+typedef struct
 {
 	int		fd;
 	int		offset;
@@ -25,6 +28,14 @@ typedef struct FT_FILE
 	char	*path;
 	char	*modes;
 }	FT_FILE;
+
+typedef struct
+{
+	int	height;
+	int	width;
+	char	*tiles;
+	int	**map;
+}	FT_MAP;
 
 int			ft_read(unsigned int buffer_size, char *buffer, FT_FILE *file);
 FT_FILE		*ft_open(char *path, char *modes);
