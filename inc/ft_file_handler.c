@@ -6,7 +6,7 @@
 /*   By: mhmichi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/31 14:17:10 by mhmichi           #+#    #+#             */
-/*   Updated: 2026/09/02 18:47:57 by mhmichi          ###   ########.fr       */
+/*   Updated: 2026/09/02 18:57:22 by mhmichi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -539,4 +539,9 @@ int	ft_update_file(FT_FILE *file)
 	if (ret <= 0)
 		return (-1);
 	return (0);
+}
+
+int	ft_print_solution(FT_FILE *file, FT_MAP *map, int x, int y)
+{
+	
 }
