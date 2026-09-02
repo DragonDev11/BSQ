@@ -6,13 +6,14 @@
 /*   By: mhmichi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/31 14:17:10 by mhmichi           #+#    #+#             */
-/*   Updated: 2026/08/31 21:58:55 by mhmichi          ###   ########.fr       */
+/*   Updated: 2026/09/02 03:17:53 by mhmichi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_file_handler.h"
 #include "ft_string.h"
 #include "ft_errors_handler.h"
+#include "ft_math.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -53,15 +54,20 @@ FT_FILE	*ft_open(char *path, char *modes)
 	if (file == NULL)
 		return (NULL);
 	if (ft_str_contains('w', modes) > -1 && ft_str_contains('r', modes) > -1)
-		file->fd = open(path, O_RDWR);
+		file->fd = open(path, O_RDWR | O_CREAT, 0644);
 	else if (ft_str_contains('w', modes) > -1)
-		file->fd = open(path, O_WRONLY);
+		file->fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	else if (ft_str_contains('r', modes) > -1)
 		file->fd = open(path, O_RDONLY);
 	file->buffer = NULL;
 	file->offset = 0;
 	file->size = 0;
 	file->modes = ft_strdup(modes);
+	if (file->modes == NULL)
+		return (NULL);
+	file->path = ft_strdup(path);
+	if (file->path == NULL)
+		return (NULL);
 	if (file->fd == -1)
 	{
 		free(file);
@@ -126,21 +132,13 @@ int	ft_close(FT_FILE *file)
 
 FT_FILE	*ft_reset_offset(FT_FILE *file)
 {
-	FT_FILE	temp;
 	FT_FILE *new;
-	
-	new = malloc(sizeof(FT_FILE));
+
+	if (file == NULL)
+		return (NULL);
+	new = ft_open(file->path, file->modes);
 	if (new == NULL)
 		return (NULL);
-	temp.path = ft_strdup(file->path);
-	temp.modes = ft_strdup(file->modes);
-	temp.length = file->length;
-	if (ft_close(file) != 0)
-	{
-		free(new);
-		return (NULL);
-	}
-	new = ft_open(temp.path, temp.modes);
 	if (new->fd == -1)
 	{
 		free(new->path);
@@ -149,6 +147,11 @@ FT_FILE	*ft_reset_offset(FT_FILE *file)
 		return (NULL);
 	}
 	new->length = temp.length;
+	if (ft_close(file) != 0)
+	{
+		free(new);
+		return (NULL);
+	}
 	return (new);
 }
 
@@ -161,27 +164,19 @@ int	ft_prep_file(FT_FILE *file)
 		return (-1);
 	if (file->fd == -1)
 		return (-1);
-	read(file->fd, &c, 1);
-	while (c != buffer[file->size - 1])
-	{
+	while (read(file->fd, &c, 1) > 0)
 		file->length++;
-		read(file->fd, &c, 1);
-	}
-	file = reset_offset(file);
-	if (new == NULL)
+	file = ft_reset_offset(file);
+	if (file == NULL)
 		return (-1);
-	buffer = (char *)malloc(sizeof(char) * length + 1);
+	buffer = (char *)malloc(sizeof(char) * file->length + 1);
 	if (buffer == NULL)
 		return (-1);
 	i = 0;
-	read(file->fd, &c, 1);
-	while (c != EOF && i < length - 1)
-	{
-		buffer[i] = c;
-		read(file->fd, &c, 1);
-	}
+	while (read(file->fd, &c, 1) > 0 && i < length - 1)
+		buffer[i++] = c;
 	buffer[i] = '\0';
-	file = reset_offset(file);
+	file = ft_reset_offset(file);
 	file->offset = 0;
 	file->buffer = buffer;
 	return (0);
@@ -214,7 +209,8 @@ char	ft_is_file_valid(FT_FILE *file)
 	int	expected_height;
 	
 	width = 0;
-	height = 0;
+	expected_height = 0;
+	actual_height = 0;
 	if (file == NULL)
 		return (0);
 	if (file->fd == -1 || file->buffer == NULL)
@@ -222,6 +218,7 @@ char	ft_is_file_valid(FT_FILE *file)
 	lines = ft_extract_lines(file);
 	if (lines == NULL)
 		return (0);
+	i = 0;
 	while (lines[i])
 		i++;
 	actual_height = i - 1;
@@ -261,7 +258,7 @@ char	ft_is_file_valid(FT_FILE *file)
 				return (0);
 			}
 		}
-		while (ft_str_contains(lines[i][j], charset) && lines[i][j])
+		while (lines[i][j] && ft_str_contains(lines[i][j], charset) > -1)
 			j++;
 		if (width == 0)
 			width = j;
@@ -273,9 +270,12 @@ char	ft_is_file_valid(FT_FILE *file)
 		i++;
 	}
 	free_double_pointer((void **)lines, actual_height + 1, sizeof(char *));
-	if (i != height)
+	if (actual_height != expected_height)
 		return (0);
 	return (1);
 }
 
-int	ft_calculate_file_size(FT_FILE *file, )
+int	ft_calculate_file_size(FT_FILE *file)
+{
+	
+}
