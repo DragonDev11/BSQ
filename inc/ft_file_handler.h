@@ -6,7 +6,7 @@
 /*   By: mhmichi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/31 14:16:36 by mhmichi           #+#    #+#             */
-/*   Updated: 2026/09/02 11:34:03 by mhmichi          ###   ########.fr       */
+/*   Updated: 2026/09/02 12:23:14 by mhmichi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ typedef struct
 	int		fd;
 	int		offset;
 	int		size;
-	int		length;
+	int		map_offset;
 	char	*buffer;
 	char	*path;
 	char	*modes;
@@ -45,5 +45,8 @@ char		ft_is_file_valid(FT_FILE *file);
 char		**ft_extract_lines(FT_FILE *file);
 int			ft_prep_file(FT_FILE *file);
 FT_FILE		*ft_reset_offset(FT_FILE *file);
+int		ft_lseek(FT_FILE *file, int offset, int mode);
+FT_MAP	*ft_extract_map(FT_FILE *file);
+int     ft_get_map_offset(char *buffer);
 #endif
 

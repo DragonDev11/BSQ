@@ -6,7 +6,7 @@
 /*   By: mhmichi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/31 17:41:40 by mhmichi           #+#    #+#             */
-/*   Updated: 2026/08/31 21:02:46 by mhmichi          ###   ########.fr       */
+/*   Updated: 2026/09/02 12:40:38 by mhmichi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,13 @@ void	free_double_pointer(void **p, unsigned int elements, unsigned int element_s
 void	ft_puterror(char *msg)
 {
 	ft_putstr("Error: ");
+	ft_putstr(msg);
+	ft_putstr("\n");
+}
+
+void	ft_putnotice(char *msg)
+{
+	ft_putstr("Notice: ");
 	ft_putstr(msg);
 	ft_putstr("\n");
 }

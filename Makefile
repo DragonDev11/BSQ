@@ -1,2 +1,2 @@
 all:
-	cc -I inc/ bsq.c inc/*.c
+	cc -I inc/ bsq.c inc/*.c -g
